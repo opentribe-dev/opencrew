@@ -1,0 +1,42 @@
+{
+    "settings":  {
+                     "git.autoRepositoryDetection":  "subFolders"
+                 },
+    "folders":  [
+                    {
+                        "path":  "."
+                    },
+                    {
+                        "name":  "server",
+                        "path":  "repos/server"
+                    },
+                    {
+                        "name":  "agentd",
+                        "path":  "repos/agentd"
+                    },
+                    {
+                        "name":  "protocol",
+                        "path":  "repos/protocol"
+                    },
+                    {
+                        "name":  "sdk",
+                        "path":  "repos/sdk"
+                    },
+                    {
+                        "name":  "app",
+                        "path":  "repos/app"
+                    },
+                    {
+                        "name":  "website",
+                        "path":  "repos/website"
+                    },
+                    {
+                        "name":  "cloud",
+                        "path":  "repos/cloud"
+                    },
+                    {
+                        "name":  "infra",
+                        "path":  "repos/infra"
+                    }
+                ]
+}

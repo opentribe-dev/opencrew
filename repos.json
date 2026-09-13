@@ -1,0 +1,42 @@
+[
+    {
+        "name":  "server",
+        "visibility":  "public",
+        "description":  "OpenCrew self-hosted server and embedded web app"
+    },
+    {
+        "name":  "agentd",
+        "visibility":  "public",
+        "description":  "OpenCrew lightweight local runtime host"
+    },
+    {
+        "name":  "protocol",
+        "visibility":  "public",
+        "description":  "OpenCrew vendor-neutral protocol and schemas"
+    },
+    {
+        "name":  "sdk",
+        "visibility":  "public",
+        "description":  "OpenCrew SDKs"
+    },
+    {
+        "name":  "app",
+        "visibility":  "public",
+        "description":  "OpenCrew official client application"
+    },
+    {
+        "name":  "website",
+        "visibility":  "public",
+        "description":  "OpenCrew website"
+    },
+    {
+        "name":  "cloud",
+        "visibility":  "private",
+        "description":  "OpenCrew managed cloud services"
+    },
+    {
+        "name":  "infra",
+        "visibility":  "private",
+        "description":  "OpenCrew deployment and infrastructure"
+    }
+]

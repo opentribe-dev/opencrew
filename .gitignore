@@ -1,0 +1,4 @@
+/repos/
+/opencrew-bootstrap*.ps1
+*.zip
+.DS_Store
