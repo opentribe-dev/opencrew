@@ -131,6 +131,27 @@ runtime binding persistence. Untested work must not be reported as completed.
 5. *(planned next)* `server-providers` — provider abstraction, Anthropic/OpenAI/
    OpenRouter/DeepSeek/OpenAI-compatible clients, agentd-backed Claude
    Subscription/Ollama contract, provider.chat/provider.models, failure handling.
+   Slots into `runAgentTurn`'s `RespondFn` seam (`repos/server/src/runtime/engine.ts`)
+   without touching that plan's persistence/orchestration code. Carries forward
+   from `server-runtime-and-agent-to-agent`'s final review: once a real
+   `RespondFn` can name a `handoffToAgentId` that doesn't correspond to a real
+   agent (today's `defaultRespond` stub never does), `runAgentTurn` needs to
+   validate the handoff target before dispatching rather than letting the
+   agent_runs FK constraint throw mid-chain after earlier hops in the same
+   chain have already persisted messages and broadcast them over WS — a
+   partial-chain failure surfaced as a 500 after real side effects occurred.
+   Also: the recursive handoff chain runs synchronously inside one HTTP
+   request, so a capped chain becomes up to 5 sequential provider calls in
+   one request — the hop cap bounds depth, not latency or cost; a wall-clock
+   or token budget belongs alongside it once real (non-stub) providers land.
+   `vendorState` on `RuntimeBinding` is not yet reachable over REST
+   (`POST /api/runtime-bindings` omits it from its body schema) — add it
+   when a runtime actually needs to write vendor session state.
+   `POST /api/runtime-sessions` checks that the caller owns `agentId` but
+   never cross-validates that `runtimeBindingId` actually belongs to that
+   same agent — a user could pair their own agent with a runtime binding
+   that belongs to a different agent (theirs or, once multi-user ownership
+   models exist, someone else's). Add that consistency check.
 6. *(planned next)* `server-memory-and-jobs` — MemoryFact CRUD + dedup, rolling
    conversation summaries, built-in background job runner.
 7. *(planned next)* `sdk-client` — `repos/sdk` REST/WS client wrapping
