@@ -198,6 +198,14 @@ runtime binding persistence. Untested work must not be reported as completed.
    DIFFERENT id than the URL addressed (correct repository behavior, but
    an undocumented REST-level surprise worth a response-shape note if this
    endpoint gets an SDK wrapper).
+   Carries forward from `sdk-client`'s final review: `WsClient` parses
+   incoming frames without schema validation or an error callback, so a
+   malformed frame can still surface as an uncaught asynchronous exception.
+   The real-server e2e covers health, auth setup, agent/DM creation, messaging,
+   live delivery, and replay, but memory/providers/runtime/approvals remain
+   fake-fetch-only; its setup/socket cleanup is also success-path-oriented.
+   Minor test polish: direct `connect()` resets `getLastSeq()` correctly, but
+   the repeated-connect regression does not assert that reset explicitly.
 8. *(planned next)* `cloud-foundations` — minimal `repos/cloud` control-plane
    scaffold, scoped to what a managed offering needs without violating the
    self-host/Claude-Subscription invariants above.
