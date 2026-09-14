@@ -107,6 +107,27 @@ runtime binding persistence. Untested work must not be reported as completed.
 4. *(planned next)* `server-runtime-and-agent-to-agent` — RuntimeSession/RuntimeBinding
    persistence, Native Agent runtime loop, agent-to-agent messaging with
    rootRunId/causationId/hopCount and max-hop enforcement, approvals.
+   Carries forward from `server-messaging-core`'s final review: `GET
+   /api/conversations/:id/messages` returns 403 (not 404) for a nonexistent
+   conversation, inconsistent with POST's 404 (not a security issue, UUIDs
+   unguessable, just API-consistency polish); `removeParticipant` ignores
+   `participant_type` despite the composite PK including it — safe today
+   given `randomUUID()` collision odds, but becomes a latent trap once
+   agents are real conversation participants this plan will add; message
+   persistence and `event_log` insertion are two separate transactions, so a
+   crash between them could leave a persisted message with no replayable
+   event — a true transactional outbox is overkill for v0.1 but worth
+   recording as a durability seam; a newly-added group member replays the
+   conversation's entire pre-join history on reconnect (implicit product
+   decision — "new members see full history" — never explicitly stated);
+   `isParticipant(..., 'user')` is hardcoded at both message route call
+   sites and will need revisiting the moment agents can post messages.
+   Also carries a documented (not code-enforced) policy: any admin/owner
+   can add themselves to any group conversation and read its full history —
+   this is intentional under the charter's single-workspace, trusted-admin
+   self-host model (same trust level as agent listing and auth already
+   assume), not an oversight. Revisit only if a multi-tenant or
+   least-privilege admin model is ever needed.
 5. *(planned next)* `server-providers` — provider abstraction, Anthropic/OpenAI/
    OpenRouter/DeepSeek/OpenAI-compatible clients, agentd-backed Claude
    Subscription/Ollama contract, provider.chat/provider.models, failure handling.
