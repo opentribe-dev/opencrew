@@ -153,7 +153,27 @@ runtime binding persistence. Untested work must not be reported as completed.
    that belongs to a different agent (theirs or, once multi-user ownership
    models exist, someone else's). Add that consistency check.
 6. *(planned next)* `server-memory-and-jobs` — MemoryFact CRUD + dedup, rolling
-   conversation summaries, built-in background job runner.
+   conversation summaries, built-in background job runner. Carries forward
+   from `server-providers`'s final review: `resolveProviderClient` throws a
+   plain `Error` (not `ProviderError`) for a provider config missing
+   `apiKey`/`baseUrl` at resolution time — REST creation now rejects such
+   configs with 400 up front, but a pre-existing or directly-DB-mutated
+   config could still reach this path and crash a `RespondFn` call outside
+   `instanceof ProviderError` handling; worth hardening if config mutation
+   ever gets a REST update endpoint. `createProviderRespond`'s
+   `toChatMessages` never emits a system-role message, so an agent's
+   `personality` field never reaches any provider today — a real product
+   gap, not a bug, to close when personality/system-prompt composition is
+   designed. `GET /api/providers` and `GET /api/providers/:id/models` are
+   `requireAuth`-only (not `provider:manage`-gated), letting any authenticated
+   member enumerate configured provider kinds/ids and trigger an outbound
+   `listModels()` call spending the configured API key — intentional under
+   the charter's trusted-single-workspace admin model (same trust level as
+   agent listing), revisit only alongside a multi-tenant/least-privilege
+   redesign. Provider API keys are stored plaintext in `provider_configs`,
+   consistent with the plaintext-session-token precedent already carried
+   from `server-messaging-core` — both should be addressed together if/when
+   at-rest encryption is prioritized.
 7. *(planned next)* `sdk-client` — `repos/sdk` REST/WS client wrapping
    `repos/protocol` types, versioned against the server API from plans 2-6.
 8. *(planned next)* `cloud-foundations` — minimal `repos/cloud` control-plane
