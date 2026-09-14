@@ -176,6 +176,28 @@ runtime binding persistence. Untested work must not be reported as completed.
    at-rest encryption is prioritized.
 7. *(planned next)* `sdk-client` — `repos/sdk` REST/WS client wrapping
    `repos/protocol` types, versioned against the server API from plans 2-6.
+   Carries forward from `server-memory-and-jobs`'s final review: nothing
+   outside `src/memory/` yet reads a `MemoryFact` or `ConversationSummary`
+   into an agent turn — `runAgentTurn` still builds context from recent
+   messages alone. The memory triad (recent messages, rolling summaries,
+   explicit facts) is now persisted and inspectable but not yet consumed;
+   a future plan needs to wire memory retrieval into the `RespondFn`/
+   runtime path for it to actually shape what an agent says. Also:
+   `defaultSummarize` re-appends the same last-20 messages on every
+   regeneration instead of using the persisted `upToMessageId` to select
+   only newer messages — not truly incremental, and duplicate content only
+   stays hidden by the 2000-char tail slice. Harmless as a deterministic
+   placeholder, but this is what production `index.ts` runs today — flag
+   it prominently for whoever writes the first real (non-placeholder)
+   `SummarizeFn`, since incrementally-wrong summaries compound quietly.
+   Smaller items: the `jobs` table has no pruning/retention (same class as
+   `event_log`'s already-carried retention gap); `failJob` has no retry/
+   backoff despite `attempts`/`run_at` columns existing for it — a
+   transient failure only heals via the next natural re-enqueue; `PATCH
+   .../memory-facts/:factId` on merge-on-collision returns 200 with a
+   DIFFERENT id than the URL addressed (correct repository behavior, but
+   an undocumented REST-level surprise worth a response-shape note if this
+   endpoint gets an SDK wrapper).
 8. *(planned next)* `cloud-foundations` — minimal `repos/cloud` control-plane
    scaffold, scoped to what a managed offering needs without violating the
    self-host/Claude-Subscription invariants above.
